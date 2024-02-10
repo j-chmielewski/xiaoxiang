@@ -2,17 +2,23 @@ import asyncio
 from bleak import BleakClient, BleakScanner
 
 ADDRESS = "A4:C1:37:30:8D:90"
-SERVICE_UUID = "0000ff00-0000-1000-8000-00805f9b34fb"
+BASIC_INFO_SERVICE = "0000ff00-0000-1000-8000-00805f9b34fb"
+# EXTENDED_INFO_SERVICE = "0000fa00-0000-1000-8000-00805f9b34fb"
+EXTENDED_INFO_SERVICE = "0000ff01-0000-1000-8000-00805f9b34fb"
+
 CHAR_UUID_TX = "0000ff02-0000-1000-8000-00805f9b34fb"
 CHAR_UUID_RX = "0000ff01-0000-1000-8000-00805f9b34fb"
 HEADER_SIZE = 4
 CELLS = 4
 CELL_VOLTAGE_OFFSET = 4
 
-async def notify_cb(_char, data):
-    print(data)
+GET_INFO_3 = bytearray([0xdd, 0xa5, 0x3, 0x0, 0xff, 0xfd, 0x77])
 
-def parse_data(data):
+async def notify_cb(_char, data):
+    print(":: Notify, received characteristic:", data)
+
+
+def parse_basic_info(data):
     # data = data[HEADER_SIZE:]
     print(f"data[0]: {data[0]}")
     print(f"data[1]: {data[1]}")
@@ -54,7 +60,7 @@ async def main(address):
             print(f":: Client already connected to {address}")
 
         print(f":: Retrieving services")
-        services = await client.get_services()
+        services = client.services
         print(f":: Retrieved services:")
         for service in services:
             print(service)
@@ -65,25 +71,44 @@ async def main(address):
         # s3 = services[3]
         # import ipdb; ipdb.set_trace()
 
-        service = services.get_service(SERVICE_UUID)
+        service = services.get_service(BASIC_INFO_SERVICE)
         if service:
             characteristic = service.get_characteristic(CHAR_UUID_RX)
-            print("characteristic:", characteristic)
+            print("basic info characteristic:", characteristic)
             for c in service.characteristics:
                 print(c)
+            if characteristic:
+                await client.start_notify(characteristic, notify_cb)
+            # characteristic = service.get_characteristic(CHAR_UUID_TX)
+            # print("extended info characteristic:", characteristic)
+            # for c in service.characteristics:
+            #     print(c)
+
+        # service = services.get_service(EXTENDED_INFO_SERVICE)
+        # if service:
+        #     characteristic = service.get_characteristic(CHAR_UUID_RX)
+        #     print("extended info characteristic:", characteristic)
+        #     for c in service.characteristics:
+        #         print(c)
 
 
-        print(":: Reading characteristic")
-        data = await client.read_gatt_char(CHAR_UUID_RX)
-        print(":: Read characteristic:")
-        print(data)
+        # print(":: Reading basic characteristic")
+        # data = await client.read_gatt_char(CHAR_UUID_RX)
+        # print(":: Read basic characteristic:")
+        # print(data, len(data))
+        # info = parse_basic_info(data)
 
-        info = parse_data(data)
+        # print(":: Registering for characteristic notification")
+
+        # print(":: Reading extended characteristic")
+        # data = await client.read_gatt_char(CHAR_UUID_TX)
+        # print(":: Read extended characteristic:")
+        # print(data)
         # print(f"Voltage: {info}")
 
         # await client.start_notify(CHAR_UUID_RX, notify_cb)
 
-        # while True:
-        #     await asyncio.sleep(1)
+        while True:
+            await asyncio.sleep(1)
 
 asyncio.run(main(ADDRESS))
