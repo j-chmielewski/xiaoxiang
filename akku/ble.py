@@ -8,7 +8,6 @@ EXTENDED_INFO_SERVICE = "0000ff01-0000-1000-8000-00805f9b34fb"
 
 CHAR_UUID_TX = "0000ff02-0000-1000-8000-00805f9b34fb"
 CHAR_UUID_RX = "0000ff01-0000-1000-8000-00805f9b34fb"
-HEADER_SIZE = 4
 CELLS = 4
 DATA_OFFSET = 4
 
@@ -33,6 +32,7 @@ class BasicInfo:
     voltage: int
     current: int
     capacity: int  # percent
+
 
 async def notify_cb(_char, data: bytearray):
     dbg(":: Notify, received characteristic:", data)

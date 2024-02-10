@@ -1,8 +1,13 @@
 import asyncio
-from akku.ble import main
+from akku.bms import Bms
 
 
 ADDRESS = "A4:C1:37:30:8D:90"
+
+async def main(address):
+    bms = Bms(address)
+    async for data in bms.read():
+        print(data)
 
 
 if __name__ == '__main__':
