@@ -12,7 +12,8 @@ HEADER_SIZE = 4
 CELLS = 4
 CELL_VOLTAGE_OFFSET = 4
 
-GET_INFO_3 = bytearray([0xdd, 0xa5, 0x3, 0x0, 0xff, 0xfd, 0x77])
+INFO_3 = bytearray([0xdd, 0xa5, 0x3, 0x0, 0xff, 0xfd, 0x77])
+INFO_4 = bytearray([0xdd, 0xa5, 0x4, 0x0, 0xff, 0xfc, 0x77])
 
 async def notify_cb(_char, data):
     print(":: Notify, received characteristic:", data)
@@ -42,11 +43,15 @@ def parse_basic_info(data):
 
     return voltage
 
+async def get_info_4(client: BleakClient):
+    print(":: Retrieving info 4")
+    response = await client.write_gatt_char(CHAR_UUID_TX, INFO_4, response=True)
+    print(":: Retrieved info 4, response:", response)
 
 async def get_info_3(client: BleakClient):
-    print(":: Getting info 3")
-    response = await client.write_gatt_char(CHAR_UUID_TX, GET_INFO_3, response=True)
-    print(":: Got info 3, response:", response)
+    print(":: Retrieving info 3")
+    response = await client.write_gatt_char(CHAR_UUID_TX, INFO_3, response=True)
+    print(":: Retrieved info 3, response:", response)
 
 
 
