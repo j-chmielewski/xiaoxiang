@@ -43,6 +43,13 @@ def parse_basic_info(data):
     return voltage
 
 
+async def get_info_3(client: BleakClient):
+    print(":: Getting info 3")
+    response = await client.write_gatt_char(CHAR_UUID_TX, GET_INFO_3, response=True)
+    print(":: Got info 3, response:", response)
+
+
+
 async def main(address):
     # print(":: Scanning for BLE devices")
     # devices = await BleakScanner.discover()
@@ -71,6 +78,7 @@ async def main(address):
         # s3 = services[3]
         # import ipdb; ipdb.set_trace()
 
+        await get_info_3(client)
         service = services.get_service(BASIC_INFO_SERVICE)
         if service:
             characteristic = service.get_characteristic(CHAR_UUID_RX)
@@ -78,7 +86,7 @@ async def main(address):
             for c in service.characteristics:
                 print(c)
             if characteristic:
-                await client.start_notify(characteristic, notify_cb)
+                await client.start_notify(CHAR_UUID_RX, notify_cb)
             # characteristic = service.get_characteristic(CHAR_UUID_TX)
             # print("extended info characteristic:", characteristic)
             # for c in service.characteristics:
@@ -92,11 +100,11 @@ async def main(address):
         #         print(c)
 
 
-        # print(":: Reading basic characteristic")
-        # data = await client.read_gatt_char(CHAR_UUID_RX)
-        # print(":: Read basic characteristic:")
-        # print(data, len(data))
-        # info = parse_basic_info(data)
+        print(":: Reading basic characteristic")
+        data = await client.read_gatt_char(CHAR_UUID_RX)
+        print(":: Read basic characteristic:")
+        print(data, len(data))
+        info = parse_basic_info(data)
 
         # print(":: Registering for characteristic notification")
 
