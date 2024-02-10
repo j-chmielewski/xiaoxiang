@@ -19,12 +19,14 @@ class BmsData:
     voltage: float
     current: float
     capacity: int  # percent
+    time_h: float  # remaining charge/discharge time
 
 
 class Bms:
 
-    def __init__(self, address: str, debug: bool = False):
+    def __init__(self, address: str, total_capacity: int, debug: bool = False):
         self.address = address
+        self.total_capacity = total_capacity
         self.debug = debug
         self.data = bytearray()
         self.queue: Queue[BmsData] = Queue()
@@ -71,16 +73,22 @@ class Bms:
 
     async def _parse_data(self):
         data = self.data[DATA_OFFSET:]
-        voltage = bytearray([0, 0, data[0], data[1]])
+        voltage = bytearray([data[0], data[1]])
         voltage = int.from_bytes(voltage, signed=False) * 0.01
         self._dbg(f":: Total voltage: {voltage:.2f}V")
-        current = bytearray([data[2] & 0b10000000, 0, data[2] & 0b01111111, data[3]])
+        current = bytearray([data[2], data[3]])
         current = int.from_bytes(current, signed=True) * 0.01
         self._dbg(f":: Current: {current:.2f}A")
-        capacity = bytearray([0, 0, 0, data[19]])
+        capacity = bytearray([data[19]])
         capacity = int.from_bytes(capacity)
         self._dbg(f":: Remaining capacity: {capacity}%")
-        await self.queue.put(BmsData(voltage=voltage, current=current, capacity=capacity))
+        if current < 0:
+            # calculate discharging time
+            time_h = self.total_capacity * capacity / 100 / -current
+        else:
+            # calculate charging time
+            time_h = self.total_capacity * (1 - capacity / 100) / current
+        await self.queue.put(BmsData(voltage=voltage, current=current, capacity=capacity, time_h=time_h))
 
 
     def _dbg(self, *msg):

@@ -5,18 +5,19 @@ from akku.ui import Gui
 
 
 ADDRESS = "A4:C1:37:30:8D:90"
+CAPACITY_AH = 200
 
-async def run_gui(stdscr, address):
-    bms = Bms(address)
+async def run_gui(stdscr, address, capacity):
+    bms = Bms(address, capacity)
     gui = Gui(stdscr)
     async for data in bms.read():
         gui.update(data)
 
 
-def main(stdscr, address):
-    asyncio.run(run_gui(stdscr, address))
+def main(stdscr, address, capacity):
+    asyncio.run(run_gui(stdscr, address, capacity))
 
 
 if __name__ == '__main__':
-    curses.wrapper(main, ADDRESS)
+    curses.wrapper(main, ADDRESS, CAPACITY_AH)
 

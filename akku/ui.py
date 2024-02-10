@@ -1,6 +1,9 @@
 import curses
+from math import floor
 from akku.bms import BmsData
 
+PROGRESS_FULL = '█'
+PROGRESS_EMPTY = '▒'
 
 class Gui:
     def __init__(self, stdscr):
@@ -11,12 +14,18 @@ class Gui:
 
     def update(self, data: BmsData):
         self.stdscr.clear()
-        capacity = f'Capacity: {data.capacity}%'
-        self.stdscr.addstr(0, 0, capacity, self._percent_color(data.capacity))
+        bars, color = self._bars(data.capacity)
+        capacity = f'{bars} {data.capacity}%'
+        self.stdscr.addstr(0, 0, capacity, color)
         power = data.current * data.voltage
         color = self._power_color(power)
-        power = f'Power: {power:.0f}W ({data.voltage:.2f}V * {data.current:.2f}A)'
+        power = f'Power: {power:.0f}W'
         self.stdscr.addstr(1, 0, power, color)
+        power = f'{data.current:.2f}A @ {data.voltage:.2f}V'
+        self.stdscr.addstr(2, 1, power, color)
+        self.stdscr.addstr(3, 0, 'Discharged in:' if data.current < 0 else 'Charged in:')
+        time = f'{floor(data.time_h)}h {round((data.time_h % 1) * 60)}m'
+        self.stdscr.addstr(4, 1, time)
         self.stdscr.refresh()
 
     @staticmethod
@@ -42,6 +51,19 @@ class Gui:
             return curses.color_pair(2)
         else:
             return curses.color_pair(3)
+
+    @staticmethod
+    def _bars(capacity: int):
+        full = round(capacity / 10)
+        bars = PROGRESS_FULL * full + PROGRESS_EMPTY * (10 - full)
+        if capacity <= 33:
+            color = curses.color_pair(1)
+        elif capacity < 66:
+            color = curses.color_pair(2)
+        else:
+            color = curses.color_pair(3)
+
+        return bars, color
 
 
 # def main(stdscr):

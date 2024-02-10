@@ -83,13 +83,13 @@ async def get_info_3(client: BleakClient):
 
 def parse_info_3(data: bytearray):
     data = data[DATA_OFFSET:]
-    voltage = bytearray([0, 0, data[0], data[1]])
+    voltage = bytearray([data[0], data[1]])
     voltage = int.from_bytes(voltage, signed=False) * 0.01
     print(f":: Total voltage: {voltage:.2f}V")
-    current = bytearray([data[2] & 0b10000000, 0, data[2] & 0b01111111, data[3]])
+    current = bytearray([data[2], data[3]])
     current = int.from_bytes(current, signed=True) * 0.01
     print(f":: Current: {current:.2f}A")
-    capacity = bytearray([0, 0, 0, data[19]])
+    capacity = bytearray([data[19]])
     capacity = int.from_bytes(capacity)
     print(f":: Remaining capacity: {capacity}%")
 
