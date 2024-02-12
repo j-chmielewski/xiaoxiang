@@ -1,6 +1,6 @@
 import curses
 from math import floor
-from akku.bms import BmsData
+from bms import BmsData
 
 PROGRESS_FULL = '█'
 PROGRESS_EMPTY = '▒'
