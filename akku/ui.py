@@ -64,38 +64,3 @@ class Gui:
             color = curses.color_pair(3)
 
         return bars, color
-
-
-# def main(stdscr):
-#     curses.initscr()
-#     curses.start_color()
-#     init_colors()
-#     while True:
-#         stdscr.clear()
-#         # bars
-#         data = benedict(get_data(sys.argv[1]))
-#         bars = data[BARS_PATH]
-#         bars_str = f'[{BARS[data[BARS_PATH]]}]'
-#         stdscr.addstr(0, 0, bars_str, bars_color(bars))
-
-#         # network
-#         network = current_network(data[SCANLIST_PATH])
-#         stdscr.addstr(0, 8, network)
-
-#         # connection type
-#         connection = data[CONNECTION_PATH]
-#         stdscr.addstr(0, 9 + len(network), f'({connection})')
-
-#         # signal
-#         for i, (k, v) in enumerate(METRICS.items()):
-#             percent = metric_percent(k, data[v])
-#             color = percent_color(percent)
-#             value = f'{k}: {data[v]}'
-#             stdscr.addstr(i+1, 0, value, color)
-#             percent = metric_percent(k, data[v])
-#             stdscr.addstr(i+1, len(value) + 1, f'({percent}%)', color)
-#         stdscr.refresh()
-#         time.sleep(1)
-
-# if __name__ == '__main__':
-#     curses.wrapper(main)

@@ -84,10 +84,10 @@ class Bms:
         self._dbg(f":: Remaining capacity: {capacity}%")
         if current < 0:
             # calculate discharging time
-            time_h = self.total_capacity * capacity / 100 / -current
+            time_h = self.total_capacity * capacity / 100 / (-current or 1)
         else:
             # calculate charging time
-            time_h = self.total_capacity * (1 - capacity / 100) / current
+            time_h = self.total_capacity * (1 - capacity / 100) / (current or 1)
         await self.queue.put(BmsData(voltage=voltage, current=current, capacity=capacity, time_h=time_h))
 
 
