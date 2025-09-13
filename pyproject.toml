@@ -1,15 +1,12 @@
-[tool.poetry]
+[project]
 name = "xiaoxiang"
 version = "0.1.0"
 description = ""
-authors = ["Jacek Chmielewski <jchmielewski@teonite.com>"]
+authors = [{ name = "Jacek Chmielewski", email = "jchmielewski@teonite.com" }]
 readme = "README.md"
 
-[tool.poetry.dependencies]
-python = "~3.12"
-bleak = "^0.21.1"
+requires-python = ">=3.13,<3.14"
 
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+dependencies = [
+     "bleak>=1.1,<1.2",
+]
